@@ -5,6 +5,17 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        if len(email) < 8:
+            flash('Email cannot be less than 8 characters.', category='danger')
+        elif len(password) < 7:
+            flash('Password must be at least 7 characters.', category='danger')
+        else:
+            flash('Logged In successfully', category='success')
+
     return render_template('login.html')
 
 @auth.route('/logout')
