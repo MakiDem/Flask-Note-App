@@ -1,4 +1,7 @@
 from flask import Blueprint, render_template, request, flash
+from .models import User
+from . import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth = Blueprint('auth', __name__)
 
@@ -14,6 +17,7 @@ def login():
         elif len(password) < 7:
             flash('Password must be at least 7 characters.', category='danger')
         else:
+            
             flash('Logged In successfully', category='success')
 
     return render_template('login.html')
@@ -39,6 +43,9 @@ def signup():
         elif password1 != password2:
             flash("Passwords don't match.", category='danger')
         else:
+            user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='sha256'))
+            db.session.add(user)
+            db.session.commit()
             flash('Account created successfully', category='success')
 
     return render_template('signup.html')
