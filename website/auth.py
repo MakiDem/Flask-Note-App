@@ -12,13 +12,15 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        if len(email) < 8:
-            flash('Email cannot be less than 8 characters.', category='danger')
-        elif len(password) < 7:
-            flash('Password must be at least 7 characters.', category='danger')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.password, password):
+                flash('Logged In successfully', category='success')
+                return redirect(url_for('views.home'))
+            else:
+                flash('Incorrect password, try again.', category='danger')
         else:
-            
-            flash('Logged In successfully', category='success')
+            flash('Email does not exist.', category='danger')
 
     return render_template('login.html')
 
@@ -43,7 +45,7 @@ def signup():
         elif password1 != password2:
             flash("Passwords don't match.", category='danger')
         else:
-            user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='sha256'))
+            user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(user)
             db.session.commit()
             flash('Account created successfully', category='success')
