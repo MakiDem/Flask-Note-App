@@ -6,6 +6,10 @@ function deleteNote(noteId) {
     },
     body: JSON.stringify({ noteId })
   }).then(response => {
-    window.location.href = '/'
+    if (response.ok) {
+      window.location.href = '/'
+    } else {
+      alert('Failed to delete note.')
+    }
   })
 }

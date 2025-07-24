@@ -54,9 +54,13 @@ def signup():
         else:
             user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(user)
-            db.session.commit()
-            login_user(user, remember=True)
-            flash('Account created successfully', category='success')
-            return redirect(url_for('views.home'))
+            try:
+                db.session.commit()
+                login_user(user, remember=True)
+                flash('Account created successfully', category='success')
+                return redirect(url_for('views.home'))
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while creating your account. Please try again.', category='danger')
 
     return render_template('signup.html', user=current_user)
